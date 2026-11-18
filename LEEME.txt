@@ -1,0 +1,10 @@
+MI RUTINA 45 - Android
+
+1. Extrae el ZIP en tu celular.
+2. En GitHub, repositorio Mi-rutina-45, usa Upload files para subir LOS CINCO archivos del interior, no el ZIP.
+3. En Settings > Pages, selecciona Deploy from a branch, main, /(root) y Save.
+4. Espera la publicación y abre el enlace de GitHub Pages en Chrome.
+5. Menú de Chrome > Instalar aplicación o Agregar a pantalla principal.
+
+La app guarda datos localmente en el navegador; exporta respaldos periódicamente.
+El icono incluido es un diseño provisional de gatito culturista.
