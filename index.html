@@ -85,9 +85,14 @@ button:focus-visible,.gallery-card:focus-visible{outline:3px solid #7fe5bd;outli
 .optional-timer{font-size:25px;font-weight:850;color:#c5daff;font-variant-numeric:tabular-nums;letter-spacing:1px}
 .optional-tip{margin:8px 0 0;color:#aebfdb;font-size:11px;line-height:1.6}
 
+.set-rest:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 12px;padding:9px 12px;border-left:3px solid var(--mint);background:var(--surface2);border-radius:8px;color:var(--text)}
+.set-rest strong{font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--mint)}
 </style>
-<link rel="manifest" href="./manifest.webmanifest">
+
 <meta name="theme-color" content="#111827">
+
+
+<link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}</script>
 </head>
@@ -185,11 +190,11 @@ function todayHTML(){let s=WORKOUTS[db.index],d=draftFor(),nSets=s.ex.length*(db
 ${legMascotHTML(s)}
 ${notifyMissing()}
 <section class="surface"><div class="row"><div><div class="eyebrow">Cronómetro de la sesión</div><div class="small muted">Empieza cuando estés listo</div></div><span class="pill">45:00</span></div><div class="timer" id="bigTimer">${secs(timerVal('timer'))}</div><div class="progress"><div id="timeProgress" style="width:${(2700-timerVal('timer'))/27}%"></div></div><div class="button-group" style="justify-content:center;margin-top:16px"><button class="button primary" data-act="toggleTimer" id="timerButton">${db.timer.runningSince?'Pausar':'Iniciar'}</button><button class="button ghost" data-act="resetTimer">Reiniciar</button></div></section>
-<section class="surface"><div class="row"><div><h3 style="margin:0">Descansos entre series</h3><p class="muted small" style="margin:4px 0 0">Activa 60, 90 o 120 segundos · 3 pitidos al finalizar</p></div><strong id="restTimer" style="font-size:22px;font-variant-numeric:tabular-nums">${secs(timerVal('rest'))}</strong></div><div class="button-group" style="margin-top:13px"><button class="button smallbtn" data-act="rest60">60 s</button><button class="button smallbtn" data-act="rest90">90 s</button><button class="button smallbtn" data-act="rest120">120 s</button><button class="button smallbtn ghost" data-act="restStop">Parar</button></div></section>
+<section class="surface"><div class="row"><div><h3 style="margin:0">Descansos entre series</h3><p class="muted small" style="margin:4px 0 0">Marca ✓ en una serie para iniciar su descanso. Al llegar a cero oirás tres golpes de campana de box.</p></div><strong id="restTimer" style="font-size:22px;font-variant-numeric:tabular-nums">${secs(timerVal('rest'))}</strong></div><div class="button-group" style="margin-top:13px"><button class="button smallbtn" data-act="rest60">60 s</button><button class="button smallbtn" data-act="rest90">90 s</button><button class="button smallbtn" data-act="rest120">120 s</button><button class="button smallbtn ghost" data-act="restStop">Parar</button><button class="button smallbtn" data-act="testBell">Probar campana</button></div></section>
 <div class="section-label">Calentamiento · 5 minutos</div><section class="surface"><p style="margin:0">${html(s.warm)}</p><p class="note" style="margin:8px 0 0">Realiza los primeros movimientos con cargas muy ligeras. No cuentan como series exigentes.</p></section>
-<div class="row"><div class="section-label">Ejercicios · ${db.setsPerExercise||2} series cada uno</div><span class="pill">${checked}/${nSets} marcadas</span></div><section class="surface">
+<div class="row"><div class="section-label">Ejercicios · ${db.setsPerExercise||2} series cada uno</div><span id="setCount" class="pill">${checked}/${nSets} marcadas</span></div><section class="surface">
 ${s.ex.map((ex,i)=>`<div class="exercise"><div class="exercise-head"><button class="exercise-thumb" data-act="showGuide" data-name="${html(ex[0])}" aria-label="Ver postura de ${html(ex[0])}">${guideImage(ex[0])}</button><div class="exercise-text"><strong>${i+1}. ${html(ex[0])}</strong><span class="pill">${html(ex[1])} repeticiones</span><div style="margin-top:9px"><button class="visual-open" data-act="showGuide" data-name="${html(ex[0])}">🐾 Ver postura y técnica</button></div></div></div><div class="hint">${html(ex[2])} · Descanso orientativo ${ex[3]} s</div>
-${Array.from({length:db.setsPerExercise||2},(_,j)=>j).map(j=>{let key=`${i}-${j}`,set=d[key]||{};return `<div class="setrow"><span class="setnum">${j+1}</span><label><span class="fieldlabel">Peso (kg)</span><input class="input" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" value="${set.kg??''}" data-draft="${key}" data-prop="kg"></label><label><span class="fieldlabel">Repeticiones</span><input class="input" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${set.reps??''}" data-draft="${key}" data-prop="reps"></label><button class="tick ${set.done?'checked':''}" data-act="tickSet" data-set="${key}" aria-label="${set.done?'Desmarcar':'Marcar'} serie ${j+1} del ejercicio ${i+1}">${set.done?'✓':'○'}</button></div>`}).join('')}
+${Array.from({length:db.setsPerExercise||2},(_,j)=>j).map(j=>{let key=`${i}-${j}`,set=d[key]||{};return `<div class="setrow"><span class="setnum">${j+1}</span><label><span class="fieldlabel">Peso (kg)</span><input class="input" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" value="${set.kg??''}" data-draft="${key}" data-prop="kg"></label><label><span class="fieldlabel">Repeticiones</span><input class="input" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${set.reps??''}" data-draft="${key}" data-prop="reps"></label><button class="tick ${set.done?'checked':''}" data-act="tickSet" data-set="${key}" aria-pressed="${!!set.done}" aria-label="${set.done?'Desmarcar':'Marcar'} serie ${j+1} del ejercicio ${i+1}">${set.done?'✓':'○'}</button></div><div class="set-rest" data-rest-set="${key}" hidden><span>Descanso · Serie ${j+1}</span><strong role="timer" aria-live="off"></strong></div>`}).join('')}
 </div>`).join('')}</section>
 <div class="section-label">Cierre de musculación · 5 minutos</div><section class="surface"><p class="small muted" style="margin:0">Movilidad suave, hidrátate y comprueba tus pesos y repeticiones. Tu entrenamiento principal termina aquí, a los 45 minutos.</p></section>
 ${optionalHTML(s)}
@@ -201,11 +206,181 @@ function signed(n){let v=Math.round(n*10)/10;return `${v>0?'+':''}${formatMetric
 function historyHTML(){let wo=[...db.workouts].reverse();return `<section class="surface hero"><div class="eyebrow">Seguimiento</div><h2>Tu constancia y progresión</h2><p>Cada sesión completada queda registrada con fecha, pesos y repeticiones.</p><div class="stats"><div class="stat"><b>${db.workouts.length}</b><small>sesiones hechas</small></div><div class="stat"><b>${db.cycle}</b><small>ciclo actual</small></div><div class="stat"><b>${db.measurements.length}</b><small>controles de medidas</small></div></div></section><section class="surface"><h3>Sesiones realizadas</h3>${wo.length?wo.map(x=>`<details class="historyitem" style="display:block"><summary style="cursor:pointer"><strong>Sesión ${x.index+1} · ${html(x.title)}</strong><small>${fmtDate(x.date)} · Ciclo ${x.cycle}</small></summary><div style="padding:10px 0 0">${x.optional&&(x.optional.main||x.optional.hypo)?`<p class="small" style="color:#b8ecd5">Extras completados: ${[x.optional.main?(x.optional.type==='flex'?'Flexibilidad':'Cardio'):null,x.optional.hypo?'Hipopresivos / respiración':null].filter(Boolean).join(' · ')}</p>`:''}${x.ex.map(e=>`<p class="small" style="margin:0 0 8px"><strong>${html(e.name)}</strong><br>${e.sets.map((v,i)=>`Serie ${i+1}: ${v.kg!==''?html(v.kg)+' kg':'sin peso anotado'}, ${v.reps!==''?html(v.reps)+' reps':'reps no anotadas'}${v.done?' ✓':''}`).join(' · ')}</p>`).join('')}</div></details>`).join(''):'<div class="empty">Aún no hay sesiones completadas.</div>'}</section><section class="surface"><h3>Control de tus datos</h3><div class="button-group"><button class="button" data-act="exportJson">Guardar copia (.json)</button><button class="button" data-act="exportCsv">Exportar medidas (.csv)</button><button class="button" data-act="copySummary">Copiar resumen para ChatGPT</button></div><div class="divider"></div><label class="fieldlabel" for="importFile">Restaurar una copia de seguridad (.json)</label><input id="importFile" class="input" type="file" accept="application/json,.json"><p class="note" style="margin:10px 0 0">La restauración reemplaza los datos actuales. Guarda una copia antes de cambiar de dispositivo.</p></section>`}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');if(tempToast)clearTimeout(tempToast);tempToast=setTimeout(()=>el.classList.remove('show'),3600)}
 function timerToggle(){unlockAlertAudio();if(db.timer.runningSince){db.timer.remaining=timerVal('timer');db.timer.runningSince=null}else{if(timerVal('timer')===0)db.timer.remaining=2700;db.timer.runningSince=Date.now()}save();render()}
-let alertAudioContext=null;
-function unlockAlertAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!alertAudioContext)alertAudioContext=new C();if(alertAudioContext.state==='suspended')alertAudioContext.resume().catch(()=>{});}catch(e){}}
-function playWorkoutAlert(){try{unlockAlertAudio();const ctx=alertAudioContext;if(!ctx||ctx.state!=='running')return;const now=ctx.currentTime;[0,.24,.48].forEach((delay,i)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='square';osc.frequency.setValueAtTime(i===2?1046:784,now+delay);gain.gain.setValueAtTime(.0001,now+delay);gain.gain.exponentialRampToValueAtTime(.12,now+delay+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+delay+.16);osc.connect(gain);gain.connect(ctx.destination);osc.start(now+delay);osc.stop(now+delay+.17)})}catch(e){}}
-function restStart(n){unlockAlertAudio();db.rest={remaining:n,runningSince:Date.now()};save();tick();toast(`Descanso de ${n} segundos iniciado`)}
-function tick(){let t=timerVal('timer'),r=timerVal('rest'),o=timerVal('optionalTimer'),ot=document.getElementById('optionalTime');if(ot)ot.textContent=secs(o);if(db.optionalTimer?.runningSince&&o===0){db.optionalTimer.runningSince=null;db.optionalTimer.remaining=0;save();toast('¡Complemento opcional terminado!');playWorkoutAlert();if(navigator.vibrate)navigator.vibrate([90,70,90])}let el=document.getElementById('bigTimer');if(el){el.textContent=secs(t);el.classList.toggle('done',t===0);let p=document.getElementById('timeProgress');if(p)p.style.width=`${(2700-t)/27}%`;}let re=document.getElementById('restTimer');if(re)re.textContent=secs(r);if(db.rest.runningSince && r===0){db.rest={remaining:0,runningSince:null};save();toast('Descanso terminado. Continúa con tu siguiente serie.');playWorkoutAlert();if(navigator.vibrate)navigator.vibrate([100,80,100])}if(db.timer.runningSince&&t===0){db.timer={remaining:0,runningSince:null};save();toast('¡45 minutos completados! Guarda los resultados de la sesión.');playWorkoutAlert();if(navigator.vibrate)navigator.vibrate([150,100,150])}}
+let alertAudioContext = null;
+let bellBuffer = null;
+let scheduledRest = null;
+
+function unlockAlertAudio() {
+  try {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) return;
+    if (!alertAudioContext || alertAudioContext.state === 'closed') {
+      alertAudioContext = new Audio();
+      alertAudioContext.addEventListener('statechange', () => {
+        if (alertAudioContext.state === 'running') tick();
+      });
+    }
+    if (alertAudioContext.state !== 'running') alertAudioContext.resume().catch(() => {});
+  } catch {}
+}
+
+function boxingBell(ctx) {
+  if (bellBuffer) return bellBuffer;
+  const rate = 24000;
+  const strikeLength = Math.floor(1.6 * rate);
+  const gap = Math.round(.54 * rate);
+  const buffer = ctx.createBuffer(1, strikeLength + gap * 2, rate);
+  const samples = buffer.getChannelData(0);
+  // Los parciales de la campana decaen a distinta velocidad después de cada golpe.
+  const partials = [[746, 1, .36], [1117, .38, .29], [1789, .35, .22],
+                    [2413, .23, .17], [3041, .16, .085], [4127, .12, .045]];
+  for (let i = 0; i < strikeLength; i++) {
+    const t = i / rate;
+    let value = 0;
+    for (const [hz, level, decay] of partials) {
+      value += level * Math.sin(2 * Math.PI * hz * t) * Math.exp(-t / decay);
+    }
+    const strike = value * Math.min(1, t / .003) * Math.min(1, (1.6 - t) / .05);
+    samples[i] += strike;
+    samples[i + gap] += strike;
+    samples[i + 2 * gap] += strike;
+  }
+  let peak = 0;
+  for (const value of samples) peak = Math.max(peak, Math.abs(value));
+  for (let i = 0; i < samples.length; i++) samples[i] *= .9 / peak;
+  bellBuffer = buffer;
+  return buffer;
+}
+
+function ringBellAt(ctx, at) {
+  const source = ctx.createBufferSource();
+  source.buffer = boxingBell(ctx);
+  source.connect(ctx.destination);
+  source.onended = () => source.disconnect();
+  source.start(at);
+  return source;
+}
+
+async function playWorkoutAlert() {
+  unlockAlertAudio();
+  const ctx = alertAudioContext;
+  if (!ctx) return false;
+  try {
+    if (ctx.state !== 'running') await ctx.resume();
+    ringBellAt(ctx, ctx.currentTime);
+    return true;
+  } catch { return false; }
+}
+
+function syncRestBell(rest, secondsLeft) {
+  // Programar el sonido desde el toque evita depender del refresco del contador.
+  if (scheduledRest && scheduledRest.rest !== rest) {
+    scheduledRest.source.stop();
+    scheduledRest = null;
+  }
+  const ctx = alertAudioContext;
+  if (!rest.runningSince || !ctx) return;
+  if (ctx.state !== 'running') {
+    if (secondsLeft === 0 && scheduledRest) {
+      scheduledRest.source.stop();
+      scheduledRest = null;
+    }
+    return;
+  }
+  const delay = Math.max(0, (rest.runningSince + rest.remaining * 1000 - Date.now()) / 1000);
+  if (scheduledRest) {
+    const drift = scheduledRest.at - (ctx.currentTime + delay);
+    if (secondsLeft === 0 ? drift <= .1 : Math.abs(drift) <= .35) return;
+    // El reloj de audio puede haberse detenido mientras Android suspendía la app.
+    scheduledRest.source.stop();
+  }
+  const at = ctx.currentTime + delay;
+  scheduledRest = {rest, at, source:ringBellAt(ctx, at)};
+}
+
+function restStart(seconds, setKey = null) {
+  unlockAlertAudio();
+  db.rest = {remaining:seconds, runningSince:Date.now(), setKey};
+  save();
+  tick();
+  if (!setKey) toast(`Descanso de ${seconds} segundos iniciado`);
+}
+
+function updateRestRows(seconds) {
+  document.querySelectorAll('[data-rest-set]').forEach(row => {
+    row.hidden = row.dataset.restSet !== db.rest.setKey;
+    if (row.hidden) return;
+    const label = seconds > 0 ? secs(seconds) : '¡Listo!';
+    const display = row.querySelector('[role="timer"]');
+    if (display.textContent !== label) display.textContent = label;
+  });
+}
+
+function toggleSet(button) {
+  const key = button.dataset.set;
+  const [exercise, series] = key.split('-').map(Number);
+  const draft = draftFor();
+  const done = !draft[key]?.done;
+  draft[key] = {...draft[key], done};
+  db.draft[workoutKey()] = draft;
+  if (done) {
+    restStart(WORKOUTS[db.index].ex[exercise][3], key);
+  } else {
+    if (db.rest.setKey === key) db.rest = {remaining:0, runningSince:null};
+    save();
+    tick();
+  }
+  button.classList.toggle('checked', done);
+  button.textContent = done ? '✓' : '○';
+  button.setAttribute('aria-pressed', String(done));
+  button.setAttribute('aria-label', `${done ? 'Desmarcar' : 'Marcar'} serie ${series+1} del ejercicio ${exercise+1}`);
+  const count = Object.values(draft).filter(set => set?.done).length;
+  const total = WORKOUTS[db.index].ex.length * (db.setsPerExercise || 2);
+  document.getElementById('setCount').textContent = `${count}/${total} marcadas`;
+}
+function tick() {
+  const session = timerVal('timer');
+  const rest = timerVal('rest');
+  const optional = timerVal('optionalTimer');
+
+  const optionalDisplay = document.getElementById('optionalTime');
+  if (optionalDisplay) optionalDisplay.textContent = secs(optional);
+  if (db.optionalTimer?.runningSince && optional === 0) {
+    db.optionalTimer.runningSince = null;
+    db.optionalTimer.remaining = 0;
+    save();
+    toast('¡Complemento opcional terminado!');
+    playWorkoutAlert();
+    navigator.vibrate?.([90,70,90]);
+  }
+
+  const timer = document.getElementById('bigTimer');
+  if (timer) {
+    timer.textContent = secs(session);
+    timer.classList.toggle('done', session === 0);
+    document.getElementById('timeProgress').style.width = `${(2700-session)/27}%`;
+  }
+  const restDisplay = document.getElementById('restTimer');
+  if (restDisplay) restDisplay.textContent = secs(rest);
+  updateRestRows(rest);
+  syncRestBell(db.rest, rest);
+  if (db.rest.runningSince && rest === 0) {
+    const bellScheduled = !!scheduledRest;
+    scheduledRest = null;
+    db.rest = {...db.rest, remaining:0, runningSince:null};
+    save();
+    toast('Descanso terminado. Continúa con tu siguiente serie.');
+    if (!bellScheduled) playWorkoutAlert();
+    navigator.vibrate?.([100,80,100]);
+  }
+  if (db.timer.runningSince && session === 0) {
+    db.timer = {remaining:0, runningSince:null};
+    save();
+    toast('¡45 minutos completados! Guarda los resultados de la sesión.');
+    playWorkoutAlert();
+    navigator.vibrate?.([150,100,150]);
+  }
+}
 function finishWorkout(){let s=WORKOUTS[db.index],d=draftFor(),count=Object.values(d).filter(v=>v?.done).length;if(count===0&&!confirm('No has marcado ninguna serie. ¿Deseas guardar igualmente la sesión como realizada?'))return;let entry={cycle:db.cycle,index:db.index,title:s.title,date:new Date().toISOString(),optional:{type:optionalType(s),...(db.optional[workoutKey()]||{})},ex:s.ex.map((e,i)=>({name:e[0],sets:Array.from({length:db.setsPerExercise||2},(_,j)=>j).map(j=>({kg:d[`${i}-${j}`]?.kg??'',reps:d[`${i}-${j}`]?.reps??'',done:!!d[`${i}-${j}`]?.done}))}))};db.workouts.push(entry);delete db.draft[workoutKey()];delete db.optional[workoutKey()];db.optionalTimer={kind:null,remaining:0,runningSince:null};db.index+=1;db.timer={remaining:2700,runningSince:null};db.rest={remaining:0,runningSince:null};if(db.index>=14){db.index=0;db.cycle++;tab='measures';toast(`¡Ciclo completado! Registra medidas del ciclo ${db.cycle}.`)}else toast(`Sesión guardada. La siguiente es la ${db.index+1}.`);save();render();window.scrollTo({top:0,behavior:'smooth'})}
 function saveMeasures(form){let formdata=new FormData(form),weight=Number(formdata.get('weight')),waist=Number(formdata.get('waist'));if(!Number.isFinite(weight)||weight<20||weight>400||!Number.isFinite(waist)||waist<30||waist>250){toast('Comprueba los valores de peso y cintura.');return}let old=getMeasurement(db.cycle);if(old){old.weight=weight;old.waist=waist;old.date=new Date().toISOString()}else db.measurements.push({cycle:db.cycle,weight,waist,date:new Date().toISOString()});save();render();toast('Medidas guardadas correctamente.');}
 function copyText(txt){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(()=>toast('Resumen copiado. Puedes pegarlo en ChatGPT.')).catch(()=>fallbackCopy(txt))}else fallbackCopy(txt)}
@@ -215,12 +390,14 @@ function download(blob,name){let url=URL.createObjectURL(blob),a=document.create
 function exportJson(){download(new Blob([JSON.stringify({app:'Mi Rutina 45',version:1,data:db},null,2)],{type:'application/json'}),`rutina45-respaldo-${new Date().toISOString().slice(0,10)}.json`);toast('Copia de seguridad generada.')}
 function exportCsv(){const rows=[['Ciclo','Fecha','Peso (kg)','Cintura (cm)'],...db.measurements.map(m=>[m.cycle,m.date.slice(0,10),m.weight,m.waist])],csv='\ufeff'+rows.map(row=>row.join(';')).join('\r\n');download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'rutina45-medidas.csv');toast('Archivo CSV generado.')}
 async function importFile(file){if(!file)return;try{let json=JSON.parse(await file.text()),d=json.data;if(!d||!Number.isInteger(d.cycle)||!Number.isInteger(d.index)||d.index<0||d.index>=14||!Array.isArray(d.measurements)||!Array.isArray(d.workouts))throw Error('Formato inválido');if(!confirm('¿Restaurar este respaldo? Reemplazará los registros actuales.'))return;db={...makeDefault(),...d};save();render();toast('Copia restaurada correctamente.')}catch(e){toast('El archivo no es un respaldo válido de Mi Rutina 45.')}}
-document.addEventListener('click',e=>{let el=e.target.closest('[data-act], [data-tab]');if(!el)return;if(el.dataset.tab){tab=el.dataset.tab;render();window.scrollTo(0,0);return}let act=el.dataset.act;if(act==='showGuide'){showGuide(el.dataset.name);return}else if(act==='showOptionalPose'){showOptionalPose(el.dataset.group,Number(el.dataset.step));return}else if(act==='closeGuide'){closeGuide();return}else if(act==='filterGallery'){galleryFilter=el.dataset.filter;render();return}else if(act==='goMeasures'){tab='measures';render();window.scrollTo(0,0)}else if(act==='sets2'||act==='sets3'){db.setsPerExercise=Number(act.slice(-1));save();render();toast('Número de series actualizado para las próximas sesiones.')}else if(act==='toggleTimer')timerToggle();else if(act==='resetTimer'){if(confirm('¿Reiniciar el cronómetro de 45 minutos?')){db.timer={remaining:2700,runningSince:null};save();render()}}else if(act==='rest60')restStart(60);else if(act==='rest90')restStart(90);else if(act==='rest120')restStart(120);else if(act==='restStop'){db.rest={remaining:0,runningSince:null};save();tick()}else if(act==='tickSet'){let k=el.dataset.set,all=draftFor();all[k]={...all[k],done:!all[k]?.done};db.draft[workoutKey()]=all;save();el.classList.toggle('checked',!!all[k].done);el.textContent=all[k].done?'✓':'○';let badge=document.querySelector('.section-label + .pill');if(badge)badge.textContent=Object.values(all).filter(x=>x?.done).length+'/'+WORKOUTS[db.index].ex.length*2+' marcadas'}else if(act==='toggleOptional'){let key=workoutKey(),o=db.optional[key]||{};o[el.dataset.kind]=!o[el.dataset.kind];db.optional[key]=o;save();render()}else if(act==='startOptional'){let kind=el.dataset.kind;db.optionalTimer={kind,remaining:kind==='main'?600:300,runningSince:Date.now()};save();render()}else if(act==='toggleOptionalTimer'){let o=db.optionalTimer;if(o.kind){if(o.runningSince){o.remaining=timerVal('optionalTimer');o.runningSince=null}else if(o.remaining>0)o.runningSince=Date.now();save();render()}}else if(act==='resetOptionalTimer'){db.optionalTimer={kind:null,remaining:0,runningSince:null};save();render()}else if(act==='finishWorkout')finishWorkout();else if(act==='exportJson')exportJson();else if(act==='exportCsv')exportCsv();else if(act==='copySummary')copyText(summaryText());});
+document.addEventListener('click',e=>{let el=e.target.closest('[data-act], [data-tab]');if(!el)return;if(el.dataset.tab){tab=el.dataset.tab;render();window.scrollTo(0,0);return}let act=el.dataset.act;if(act==='showGuide'){showGuide(el.dataset.name);return}else if(act==='showOptionalPose'){showOptionalPose(el.dataset.group,Number(el.dataset.step));return}else if(act==='closeGuide'){closeGuide();return}else if(act==='filterGallery'){galleryFilter=el.dataset.filter;render();return}else if(act==='goMeasures'){tab='measures';render();window.scrollTo(0,0)}else if(act==='sets2'||act==='sets3'){db.setsPerExercise=Number(act.slice(-1));save();render();toast('Número de series actualizado para las próximas sesiones.')}else if(act==='toggleTimer')timerToggle();else if(act==='resetTimer'){if(confirm('¿Reiniciar el cronómetro de 45 minutos?')){db.timer={remaining:2700,runningSince:null};save();render()}}else if(act==='rest60')restStart(60);else if(act==='rest90')restStart(90);else if(act==='rest120')restStart(120);else if(act==='restStop'){db.rest={remaining:0,runningSince:null};save();tick()}else if(act==='tickSet'){toggleSet(el)}else if(act==='testBell'){playWorkoutAlert().then(played=>{if(!played)toast('No se pudo reproducir la campana. Vuelve a tocar para probar.')})}else if(act==='toggleOptional'){let key=workoutKey(),o=db.optional[key]||{};o[el.dataset.kind]=!o[el.dataset.kind];db.optional[key]=o;save();render()}else if(act==='startOptional'){unlockAlertAudio();let kind=el.dataset.kind;db.optionalTimer={kind,remaining:kind==='main'?600:300,runningSince:Date.now()};save();render()}else if(act==='toggleOptionalTimer'){unlockAlertAudio();let o=db.optionalTimer;if(o.kind){if(o.runningSince){o.remaining=timerVal('optionalTimer');o.runningSince=null}else if(o.remaining>0)o.runningSince=Date.now();save();render()}}else if(act==='resetOptionalTimer'){db.optionalTimer={kind:null,remaining:0,runningSince:null};save();render()}else if(act==='finishWorkout')finishWorkout();else if(act==='exportJson')exportJson();else if(act==='exportCsv')exportCsv();else if(act==='copySummary')copyText(summaryText());});
 document.addEventListener('input',e=>{if(e.target.matches('[data-draft]')){let k=e.target.dataset.draft,prop=e.target.dataset.prop,all=draftFor();all[k]={...all[k],[prop]:e.target.value};db.draft[workoutKey()]=all;save()}});
 document.addEventListener('submit',e=>{if(e.target.id==='measureForm'){e.preventDefault();saveMeasures(e.target)}});
 document.addEventListener('change',e=>{if(e.target.id==='importFile')importFile(e.target.files?.[0])});
 document.getElementById('guideOverlay').addEventListener('click',e=>{if(e.target.id==='guideOverlay')closeGuide()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeGuide()});
-render();setInterval(tick,1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tick()});
+document.addEventListener('click',()=>{if((db.rest.runningSince||db.timer.runningSince||db.optionalTimer.runningSince) && alertAudioContext?.state!=='running')unlockAlertAudio()},{capture:true});
+render();setInterval(tick,250);
 
 </script>
 </body>
